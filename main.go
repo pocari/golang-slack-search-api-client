@@ -100,6 +100,9 @@ func search(sc searchCondition) ([]searchResult, error) {
 	if conf.debug {
 		fmt.Fprintf(os.Stderr, "query: %s\n", query)
 	}
+	if os.Getenv("SLACK_TOKEN") == "" {
+		return nil, fmt.Errorf("ERROR: SLACK_TOKENが設定されていません。")
+	}
 	api := slack.New(os.Getenv("SLACK_TOKEN"))
 	result := [][]slack.SearchMessage{}
 	sp := slack.SearchParameters{
@@ -181,7 +184,10 @@ func generateSearchCondition() searchCondition {
 }
 
 func main() {
-	parseOptions()
+	if err := parseOptions(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	sc := generateSearchCondition()
 	if conf.debug {
@@ -189,7 +195,8 @@ func main() {
 	}
 	result, err := search(sc)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	if sc.searchWord != "" && sc.reaction != "" {
