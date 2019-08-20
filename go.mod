@@ -1,4 +1,4 @@
-module github.com/pocari/golang-slack-api-client
+module github.com/pocari/golang-slack-search-api-client
 
 go 1.12
 
